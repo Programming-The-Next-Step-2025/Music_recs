@@ -1,0 +1,116 @@
+---
+title: "my-vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{my-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(music)
+```
+
+## Introduction
+
+This vignette introduces the Vibe-Based Playlist Generator, a Shiny application designed to recommend songs similar in "vibe" to a user-selected track.
+
+Instead of relying on external APIs (e.g., Spotify), the app uses a local dataset of audio features like danceability, energy, valence, and tempo to compute vibe similarity between songs.
+
+The app helps users discover songs that feel like the ones they already love.
+
+## Dataset
+
+The app uses a dataset of 2,000 songs containing the following columns:
+
+song: Song title
+
+artist: Performing artist
+
+genre: Song genre
+
+others: danceability, energy, valence, acousticness, instrumentalness, liveness, speechiness, tempo: numerical audio features
+
+Each row represents a single track.
+
+```{r}
+library(readr)
+music_data <- read_csv("songs_normalize.csv")
+head(music_data)
+```
+
+## Core Idea: Vibe Similarity
+
+The app calculates the Euclidean distance between the feature vector of the input song and all other songs in the dataset.
+
+Given a song S, we extract its audio feature vector:
+
+```{r}
+features <- c("danceability", "energy", "valence", "acousticness", 
+              "instrumentalness", "liveness", "speechiness", "tempo")
+
+song_vector <- music_data[music_data$song == "Stay", features]
+
+```
+
+We then compute distances:
+
+```{r}
+distances <- apply(music_data[, features], 1, function(x) sqrt(sum((x - song_vector)^2)))
+
+```
+
+The 10 songs with the smallest distance (excluding the original) are returned as recommendations.
+
+## Interactive Filters
+
+To refine results, the app includes:
+
+Sliders for:
+
+```         
+energy
+
+valence (happy/sad mood)
+
+danceability
+```
+
+A genre filter dropdown
+
+Control for number of recommendations
+
+These allow the user to shape the "vibe zone" of the playlist.
+
+## Example
+
+Suppose a user searches for "Stay", sets the energy range to [0.6, 1.0] and danceability to [0.5, 1.0].
+
+The app will:
+
+```         
+Match "Stay" in the dataset
+
+Filter to songs that meet the energy/danceability conditions
+
+Compute distances to all filtered songs
+
+Return the top N closest songs
+```
+
+```{r}
+filtered <- music_data %>%
+  filter(energy >= 0.6, danceability >= 0.5)
+
+song_vec <- filtered[filtered$song == "Stay", features]
+filtered$distance <- apply(filtered[, features], 1, function(x) sqrt(sum((x - song_vec)^2)))
+head(filtered[order(filtered$distance), ])
+
+```
