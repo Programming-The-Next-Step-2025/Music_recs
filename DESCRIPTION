@@ -1,17 +1,16 @@
 Package: music
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Vibe Playlist Generator
 Version: 0.1.0
 Authors@R: c(
     person(
-      "Jane", "Doe",
-      email = "jane@example.com",
+      "Alexia", "Virga",
+      email = "alexiavirga@gmail.com",
       role = c("aut", "cre")
     )
   )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
-License: What license is it under?
+Description: This package helps a user to be able to input any song that they want, and based on the genre and the artist, they will receive a playlist that matches the inputed song's vibe.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2
@@ -19,3 +18,13 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+Depends: 
+    R (>= 3.5)
+Imports:
+    shiny,
+    shinythemes,
+    dplyr,
+    stringr,
+    readr,
+    DT,
+    magrittr
